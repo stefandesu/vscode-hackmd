@@ -9,6 +9,12 @@ export async function registerUserCommands(context: vscode.ExtensionContext) {
             return;
         }
 
+        const type = await vscode.window.showQuickPick(
+            ['Normal', 'LDAP'],
+            {
+                canPickMany: false
+            }
+        )
         const email = await vscode.window.showInputBox({
             ignoreFocusOut: true,
             password: false,
@@ -36,6 +42,7 @@ export async function registerUserCommands(context: vscode.ExtensionContext) {
             }
         });
 
+        context.globalState.update('login-type', type);
         context.globalState.update('email', email);
         context.globalState.update('password', password);
 

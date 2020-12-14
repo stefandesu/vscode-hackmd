@@ -27,12 +27,16 @@ export const checkLogin = async () => {
 };
 
 export const login = async (context: vscode.ExtensionContext) => {
-    const { email, password } = getLoginCredential(context);
+    const { type, email, password } = getLoginCredential(context);
     if (!email || !password) {
         vscode.window.showInformationMessage('Please enter your email and password to use HackMD extension!');
         return;
     }
-    await API.login(email, password);
+    if (type === 'LDAP') {
+        await API.loginLdap(email, password);
+    } else {
+        await API.login(email, password);
+    }
     if (await checkLogin()) {
         store.isLogin = true;
         vscode.window.showInformationMessage('Successfully login!');
@@ -42,7 +46,8 @@ export const login = async (context: vscode.ExtensionContext) => {
 };
 
 export const getLoginCredential = (context: vscode.ExtensionContext) => {
+    const type: string = context.globalState.get('login-type');
     const email: string = context.globalState.get('email');
     const password: string = context.globalState.get('password');
-    return { email, password };
+    return { type, email, password };
 };
